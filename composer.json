@@ -1,13 +1,20 @@
 {
     "name": "kanti/hub-updater",
-    "description": "Simpel Github Updater for Web Projects [PHP]",
-    "license": "GPL v2",
+    "description": "Simple Github Updater for Web Projects [PHP]",
+    "license": "GPL-2.0",
     "authors": [
         {
             "name": "Kanti",
-            "email": "git@kanti.de"
+            "email": "git@kanti.de",
+            "homepage": "https://kanti.de",
+            "role": "Developer"
         }
     ],
+    "support": {
+        "forum": "https://github.com/Kanti/hub-updater/issues",
+        "issues": "https://github.com/Kanti/hub-updater/issues",
+		"source": "https://github.com/Kanti/hub-updater"
+    },
     "minimum-stability": "dev",
     "require": {},
 	"autoload": {
