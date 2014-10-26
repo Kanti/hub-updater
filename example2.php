@@ -2,11 +2,11 @@
 require 'vendor/autoload.php';
 
 $updater = new Kanti\HubUpdater([
-	'name' => 'kanti/xms',
+	'name' => 'kanti/test',
 	'branch' => 'master',
 	'cache' => 'cache/',
+	'save' => 'save/',
 	'prerelease' => false,
-	'draft' => false,
 ]);
 if($updater->able())
 {
