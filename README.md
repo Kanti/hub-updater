@@ -1,10 +1,57 @@
-hubupdater
+\Kanti\HubUpdater
 ==========
 
 Simpel Github Updater for Web Projects [PHP]
 
+is HubUpdater for me? [Checklist]
+----------
+- [ ] I have an little Product/Projekt on github.
+- [ ] it uses PHP
+- [ ] I wont my users to update my Product with one klick
+
+Installing via Composer
+----------
+
+The recommended way to install hub-updater is through
+[Composer](http://getcomposer.org).
+
+```bash
+# Install Composer
+curl -sS https://getcomposer.org/installer | php
+```
+
+Next, run the Composer command to install the latest stable version of Guzzle:
+
+```bash
+composer require kanti/hub-updater
+```
+
+After installing, you need to require Composer's autoloader:
+
+```php
+<?php
+require 'vendor/autoload.php';
+```
+
+
+Settings
+----------
+```php
+$settings = array(
+	"settingsKey" => 'value',
+);
+new \Kanti\HubUpdater($settings);
+```
+|Setting|Description|default|
+|---|---|---|
+|name|the name your Repository has |must be set|
+|branch|the branch you like to watch. |default: ``master``|
+|cache|the directory you like to put the cache stuff |default: ``./cache/``|
+|save|the directory you like to put the content of the zip. |default: ``./``|
+|prerelease|would you like to download the prereleases? |default: ``false``|
+
 Check for an update [simple]
-==========
+----------
 ```php
 <?php
 require 'vendor/autoload.php';
@@ -14,17 +61,17 @@ $updater->update();
 ```
 
 Check for an update [complete]
-==========
+----------
 ```php
 <?php
 require 'vendor/autoload.php';
 
 $updater = new \Kanti\HubUpdater([
-  "name" => 'kanti/test',
-	'branch' => 'master',
-	'cache' => 'cache/',
-	'save' => 'save/',
-	'prerelease' => false,
+	"name" => 'kanti/test',//Repository to watch
+	"branch" => 'master',//wich branch to watch
+	"cache" => 'cache/',//were to put the caching stuff
+	"save" => 'save/',//there to put the downloaded Version[default ./]
+	"prerelease" => true,//accept prereleases?
 ]);
 if($updater->able())
 {
@@ -35,7 +82,7 @@ if($updater->able())
 	}
 	else
 	{
-		echo '<a href="?update">Update Me</a>';		
+		echo '<a href="?update">Update Me</a>';	//only update if they klick this link	
 	}
 }
 else
