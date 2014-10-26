@@ -99,3 +99,6 @@ else
 	echo '<p>uptodate :)</p>';
 }
 ```
+Thanks:
+----------
+- ca_bundle.crt form [bagder/ca-bundle](https://github.com/bagder/ca-bundle)
