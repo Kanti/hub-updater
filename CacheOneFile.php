@@ -7,7 +7,7 @@ class CacheOneFile {
     protected $fileName = "";
     protected $holdTime = 43200; //12h
 
-    public function __construct($fileName, $holdTime = 1) {
+    public function __construct($fileName, $holdTime = 43200) {
         $this->fileName = $fileName;
         $this->holdTime = $holdTime;
     }
