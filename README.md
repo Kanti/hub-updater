@@ -64,10 +64,10 @@ new \Kanti\HubUpdater($settings);
 |Setting|Description|default|
 |---|---|---|
 |name|the name your Repository has |must be set|
-|branch|the branch you like to watch. |default: ``master``|
-|cache|the directory you like to put the cache stuff |default: ``./cache/``|
-|save|the directory you like to put the content of the zip. |default: ``./``|
-|prerelease|would you like to download the prereleases? |default: ``false``|
+|branch|the branch you like to watch. |``master``|
+|cache|the directory you like to put the cache stuff |``./cache/``|
+|save|the directory you like to put the content of the zip. |``./``|
+|prerelease|would you like to download the prereleases? |``false``|
 
 Check for an update [complete]
 ----------
