@@ -1,13 +1,32 @@
-\Kanti\HubUpdater
+HubUpdater
 ==========
 
-Simpel Github Updater for Web Projects [PHP]
+Simple Github Updater for Web Projects [PHP]
 
 is HubUpdater for me? [Checklist]
 ----------
-- [ ] I have an little Product/Projekt on github.
+- [ ] I have an little product/projekt on github.
 - [ ] it uses PHP
-- [ ] I wont my users to update my Product with one klick
+- [ ] I want my users to update my Product with one click
+
+Check for an update [simple]
+----------
+```php
+<?php
+require 'vendor/autoload.php';
+
+$updater = new \Kanti\HubUpdater('kanti/test');
+$updater->update();
+```
+
+how to provide an update?
+----------
+- Go to your Repository->
+- click on ``releases``->
+- ``Draft a new release``->
+- Enter your details->
+- click on ``Publish release``
+
 
 Installing via Composer
 ----------
@@ -49,16 +68,6 @@ new \Kanti\HubUpdater($settings);
 |cache|the directory you like to put the cache stuff |default: ``./cache/``|
 |save|the directory you like to put the content of the zip. |default: ``./``|
 |prerelease|would you like to download the prereleases? |default: ``false``|
-
-Check for an update [simple]
-----------
-```php
-<?php
-require 'vendor/autoload.php';
-
-$updater = new \Kanti\HubUpdater('kanti/test');
-$updater->update();
-```
 
 Check for an update [complete]
 ----------
