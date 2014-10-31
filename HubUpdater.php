@@ -183,4 +183,15 @@ class HubUpdater {
             return false;
         }
     }
+
+    public function printOne() {
+        $string = "<h3>Updated to<h3>";
+        $string .= "<h2>[" . $this->newestRelease['tag_name'] . "] " . $this->newestRelease['name'] . "</h2>\n";
+        $string .= "<p>" . $this->newestRelease['body'] . "</p>\n";
+        return $string;
+    }
+
+    public function getName() {
+        return $this->newestRelease['tag_name'];
+    }
 }
