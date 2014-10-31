@@ -56,24 +56,34 @@ class HubUpdater {
 		$this->cachedInfo = new CacheOneFile($this->options['cache'] . $this->options['cacheFile']);
 
         $this->streamContext = stream_context_create(
-                array(
-                    'http' => array(
-                        'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\n
-									 Accept: application/vnd.github.v3+json",
-                    ),
-                    'ssl' => array(
-                        'cafile' => dirname(__FILE__) . '/ca_bundle.crt',
-                        'verify_peer' => true,
-                    )
-                )
+			array(
+				'http' => array(
+					'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\n
+								 Accept: application/vnd.github.v3+json",
+				),
+				'ssl' => array(
+					'cafile' => dirname(__FILE__) . '/ca_bundle.crt',
+					'verify_peer' => true,
+				),
+			)
+        );
+        $this->streamContext2 = stream_context_create(
+			array(
+				'http' => array(
+					'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\n",
+				),
+				'ssl' => array(
+					'cafile' => dirname(__FILE__) . '/ca_bundle.crt',
+					'verify_peer' => true,
+				),
+			)
         );
         $this->allRelease = $this->getRemoteInfos();
     }
 
     protected function getRemoteInfos() {
         $path = "https://api.github.com/repos/" . $this->options['name'] ."/releases";
-		//$path = "http://127.0.0.1/git/hub-updater/cache/offline.json";//DEBUG
-        if ($this->cachedInfo->is()) {
+		if ($this->cachedInfo->is()) {
             $fileContent = $this->cachedInfo->get();
         } else {
             if (!in_array('https', stream_get_wrappers())) {
@@ -101,7 +111,7 @@ class HubUpdater {
             return false;
         if (empty($this->allRelease))
             return false;
-			
+		
 		foreach($this->allRelease as $release)
 		{
 			if(!$this->options['prerelease'] && $release['prerelease'])
@@ -141,10 +151,11 @@ class HubUpdater {
     }
 
     protected function download($url) {
-        $file = @fopen($url, 'r', false, $this->streamContext);
+        $file = @fopen($url, 'r', false, $this->streamContext2);
         if ($file == false)
             return false;
         file_put_contents(dirname($_SERVER['SCRIPT_FILENAME']) . "/" . $this->options['cache'] . $this->options['zipFile'], $file);
+		fclose($file);
         return true;
     }
 
