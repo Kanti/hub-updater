@@ -5,7 +5,7 @@ Simple Github Updater for Web Projects [PHP]
 
 is HubUpdater for me? [Checklist]
 ----------
-- [ ] I have an little product/projekt on github.
+- [ ] I have an little product/projekt on github. (~ 0-30MB)
 - [ ] it uses PHP
 - [ ] I want my users to update my Product with one click
 
