@@ -15,8 +15,9 @@ class CacheOneFile
 
     public function is()
     {
-        if (!file_exists($this->fileName))
+        if (! file_exists($this->fileName)) {
             return false;
+        }
         if (filemtime($this->fileName) < ( time() - $this->holdTime )) {
             unlink($this->fileName);
 
