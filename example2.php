@@ -8,19 +8,13 @@ $updater = new \Kanti\HubUpdater([
     "save" => 'save/',//there to put the downloaded Version[default ./]
     "prerelease" => true,//accept prereleases?
 ]);
-if($updater->able())
-{
-    if(isset($_GET['update']))
-    {
+if ($updater->able()) {
+    if (isset($_GET['update'])) {
         $updater->update();
         echo '<p>updated :)</p>';
+    } else {
+        echo '<a href="?update">Update Me</a>'; //only update if they klick this link
     }
-    else
-    {
-        echo '<a href="?update">Update Me</a>'; //only update if they klick this link   
-    }
-}
-else
-{
+} else {
     echo '<p>uptodate :)</p>';
 }
