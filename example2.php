@@ -1,13 +1,13 @@
 <?php
 require 'vendor/autoload.php';
 
-$updater = new \Kanti\HubUpdater([
+$updater = new \Kanti\HubUpdater(array(
     "name" => 'kanti/test',//Repository to watch
     "branch" => 'master',//wich branch to watch
     "cache" => 'cache/',//were to put the caching stuff
     "save" => 'save/',//there to put the downloaded Version[default ./]
     "prerelease" => true,//accept prereleases?
-]);
+));
 if ($updater->able()) {
     if (isset($_GET['update'])) {
         $updater->update();

@@ -4,20 +4,21 @@ namespace Kanti;
 
 class HubUpdater
 {
-    protected $options = [
+    protected $options = array(
         "cacheFile" => "downloadInfo.json",
         "versionFile" => "installedVersion.json",
         "zipFile" => "tmpZipFile.zip",
+        "updateignore" => ".updateignore",
 
         "name" => "",
         "branch" => "master",
         "cache" => "cache/",
         "save" => "",
         "prerelease" => false,
-    ];
+    );
 
-    protected $allRelease = [];
-    protected $newestRelease = [];
+    protected $allRelease = array();
+    protected $newestRelease = array();
     protected $streamContext = null;
 
     public function __construct($option)
@@ -33,18 +34,18 @@ class HubUpdater
             throw new Exception('No Option Set');
         }
 
-        $this->options['cache'] = rtrim($this->options['cache'], '/');
-        if ($this->options['cache'] !== '') {
-            $this->options['cache'] .= '/';
-            if (!file_exists($this->options['cache'])) {
-                mkdir($this->options['cache']);
-            }
-        }
         $this->options['save'] = rtrim($this->options['save'], '/');
         if ($this->options['save'] !== '') {
             $this->options['save'] .= '/';
             if (!file_exists($this->options['save'])) {
                 mkdir($this->options['save']);
+            }
+        }
+        $this->options['cache'] = $this->options['save'] . rtrim($this->options['cache'], '/');
+        if ($this->options['cache'] !== '') {
+            $this->options['cache'] .= '/';
+            if (!file_exists($this->options['cache'])) {
+                mkdir($this->options['cache']);
             }
         }
 
@@ -92,7 +93,7 @@ class HubUpdater
             }
             $json = json_decode($fileContent, true);
             if (isset($json['message'])) {
-                $json = [];
+                $json = array();
             }
             $fileContent = json_encode($json, JSON_PRETTY_PRINT);
             $this->cachedInfo->set($fileContent);
@@ -175,20 +176,38 @@ class HubUpdater
     protected function unZip()
     {
         $path = dirname($_SERVER['SCRIPT_FILENAME']) . "/" . $this->options['cache'] . $this->options['zipFile'];
+        $updateIgnore = array();
+        if (file_exists($this->options['updateignore'])) {
+            $updateIgnore = file($this->options['updateignore']);
+            foreach($updateIgnore as &$ignore) {
+                $ignore = $this->options['save'] . trim($ignore);
+            }
+        }
 
         $zip = new \ZipArchive();
         if ($zip->open($path) === true) {
             $cutLength = strlen($zip->getNameIndex(0));
             for ($i = 1; $i < $zip->numFiles; $i++) {//iterate throw the Zip
-                $fileName = $zip->getNameIndex($i);
-                $stat = $zip->statIndex($i);
-                if ($stat["crc"] == 0) {
-                    $dirName = $this->options['save'] . substr($fileName, $cutLength);
-                    if (!file_exists($dirName)) {
-                        mkdir($dirName);
+                $name = $this->options['save'] . substr($zip->getNameIndex($i), $cutLength);
+                
+                $do = true;
+                
+                foreach($updateIgnore as $ignore) {
+                    if (substr($name, 0, strlen($ignore)) == $ignore) {
+                        $do = false;
+                        break;
                     }
-                } else {
-                    copy("zip://" . $path . "#" . $fileName, $this->options['save'] . substr($fileName, $cutLength));
+                }
+                
+                if ($do) {
+                    $stat = $zip->statIndex($i);
+                    if ($stat["crc"] == 0) {
+                        if (!file_exists($name)) {
+                            mkdir($name);
+                        }
+                    } else {
+                        copy("zip://" . $path . "#" . $zip->getNameIndex($i), $name);
+                    }
                 }
             }
             $zip->close();
