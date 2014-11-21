@@ -2,6 +2,11 @@
 
 namespace Kanti;
 
+/*
+rewrite:
+only do if nececery
+*/
+
 class HubUpdater
 {
     protected $options = array(
@@ -18,7 +23,6 @@ class HubUpdater
     );
 
     protected $allRelease = array();
-    protected $newestRelease = array();
     protected $streamContext = null;
 
     public function __construct($option)
@@ -112,26 +116,17 @@ class HubUpdater
         if (empty($this->allRelease)) {
             return false;
         }
-
-        foreach ($this->allRelease as $release) {
-            if (!$this->options['prerelease'] && $release['prerelease']) {
-                continue;
-            }
-            if ($this->options['branch'] !== $release['target_commitish']) {
-                continue;
-            }
-            $this->newestRelease = $release;
-            break;
-        }
+		
+		$this->getNewestInfo();
 
         if (file_exists($this->options['cache'] . $this->options['versionFile'])) {
             $fileContent = file_get_contents($this->options['cache'] . $this->options['versionFile']);
             $current = json_decode($fileContent, true);
 
-            if (isset($current['id']) && $current['id'] == $this->newestRelease['id']) {
+            if (isset($current['id']) && $current['id'] == $this->newestInfo['id']) {
                 return false;
             }
-            if (isset($current['tag_name']) && $current['tag_name'] == $this->newestRelease['tag_name']) {
+            if (isset($current['tag_name']) && $current['tag_name'] == $this->newestInfo['tag_name']) {
                 return false;
             }
         }
@@ -217,18 +212,48 @@ class HubUpdater
             return false;
         }
     }
+	
+	public function getCurrentInfo()
+	{
+		if(isset($this->currentInfo)) {
+			return $this->currentInfo;
+		}
+		
+		$this->currentInfo = null;
+        if (file_exists($this->options['cache'] . $this->options['versionFile'])) {
+			$fileContent = file_get_contents($this->options['cache'] . $this->options['versionFile']);
+			$current = json_decode($fileContent, true);
 
-    public function printOne()
-    {
-        $string = "<h3>Updated to<h3>";
-        $string .= "<h2>[" . $this->newestRelease['tag_name'] . "] " . $this->newestRelease['name'] . "</h2>\n";
-        $string .= "<p>" . $this->newestRelease['body'] . "</p>\n";
-
-        return $string;
-    }
-
-    public function getName()
-    {
-        return $this->newestRelease['tag_name'];
-    }
+			foreach ($this->allRelease as $release) {
+				if (isset($current['id']) && $current['id'] == $release['id']) {
+					$this->currentInfo = $release;
+					break;
+				}
+				if (isset($current['tag_name']) && $current['tag_name'] == $release['tag_name']) {
+					$this->currentInfo = $release;
+					break;
+				}
+			}
+		}
+		return $this->currentInfo;
+	}
+	
+	public function getNewestInfo()
+	{
+		if(isset($this->newestInfo)) {
+			return $this->newestInfo;
+		}
+		
+        foreach ($this->allRelease as $release) {
+            if (!$this->options['prerelease'] && $release['prerelease']) {
+                continue;
+            }
+            if ($this->options['branch'] !== $release['target_commitish']) {
+                continue;
+            }
+            $this->newestInfo = $release;
+            break;
+        }
+		return $this->newestInfo;
+	}
 }

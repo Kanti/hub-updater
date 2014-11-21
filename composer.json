@@ -23,5 +23,14 @@
 		"psr-4": {
 			"Kanti\\": ""
 		}
-    }
+    },
+	"archive": {
+		"exclude": [
+			"/example.php",
+			"/example2.php",
+			"/.gitignore",
+			"/.updateignore",
+			"/README.md"
+		]
+	}
 }
