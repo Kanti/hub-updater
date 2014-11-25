@@ -26,11 +26,11 @@
     },
 	"archive": {
 		"exclude": [
-			"/example.php",
-			"/example2.php",
-			"/.gitignore",
-			"/.updateignore",
-			"/README.md"
+			"example.php",
+			"example2.php",
+			".gitignore",
+			".updateignore",
+			"README.md"
 		]
 	}
 }
