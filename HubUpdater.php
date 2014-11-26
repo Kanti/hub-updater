@@ -20,6 +20,8 @@ class HubUpdater
         "cache" => "cache/",
         "save" => "",
         "prerelease" => false,
+		
+		"internetException" => false,
     );
 
     protected $allRelease = array();
@@ -41,14 +43,14 @@ class HubUpdater
         $this->options['save'] = rtrim($this->options['save'], '/');
         if ($this->options['save'] !== '') {
             $this->options['save'] .= '/';
-            if (!file_exists($this->options['save'])) {
+            if (!HelperClass::fileExists($this->options['save'])) {
                 mkdir($this->options['save']);
             }
         }
         $this->options['cache'] = $this->options['save'] . rtrim($this->options['cache'], '/');
         if ($this->options['cache'] !== '') {
             $this->options['cache'] .= '/';
-            if (!file_exists($this->options['cache'])) {
+            if (!HelperClass::fileExists($this->options['cache'])) {
                 mkdir($this->options['cache']);
             }
         }
@@ -62,7 +64,7 @@ class HubUpdater
                                  Accept: application/vnd.github.v3+json",
                 ),
                 'ssl' => array(
-                    'cafile' => dirname(__FILE__) . '/ca_bundle.crt',
+                    'cafile' => dirname($_SERVER["SCRIPT_FILENAME"]) . '/ca_bundle.crt',
                     'verify_peer' => true,
                 ),
             )
@@ -73,7 +75,7 @@ class HubUpdater
                     'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\n",
                 ),
                 'ssl' => array(
-                    'cafile' => dirname(__FILE__) . '/ca_bundle.crt',
+                    'cafile' => dirname($_SERVER["SCRIPT_FILENAME"]) . '/ca_bundle.crt',
                     'verify_peer' => true,
                 ),
             )
@@ -93,7 +95,11 @@ class HubUpdater
             $fileContent = @file_get_contents($path, false, $this->streamContext);
 
             if ($fileContent === false) {
-                return array();
+				if($this->options["internetException"]){
+					throw new Exception("No Internet Exception");
+				} else {
+					return array();
+				}
             }
             $json = json_decode($fileContent, true);
             if (isset($json['message'])) {
@@ -119,7 +125,7 @@ class HubUpdater
 		
 		$this->getNewestInfo();
 
-        if (file_exists($this->options['cache'] . $this->options['versionFile'])) {
+        if (HelperClass::fileExists($this->options['cache'] . $this->options['versionFile'])) {
             $fileContent = file_get_contents($this->options['cache'] . $this->options['versionFile']);
             $current = json_decode($fileContent, true);
 
@@ -172,7 +178,7 @@ class HubUpdater
     {
         $path = dirname($_SERVER['SCRIPT_FILENAME']) . "/" . $this->options['cache'] . $this->options['zipFile'];
         $updateIgnore = array();
-        if (file_exists($this->options['updateignore'])) {
+        if (HelperClass::fileExists($this->options['updateignore'])) {
             $updateIgnore = file($this->options['updateignore']);
             foreach($updateIgnore as &$ignore) {
                 $ignore = $this->options['save'] . trim($ignore);
@@ -197,7 +203,7 @@ class HubUpdater
                 if ($do) {
                     $stat = $zip->statIndex($i);
                     if ($stat["crc"] == 0) {
-                        if (!file_exists($name)) {
+                        if (!HelperClass::fileExists($name)) {
                             mkdir($name);
                         }
                     } else {
@@ -220,7 +226,7 @@ class HubUpdater
 		}
 		
 		$this->currentInfo = null;
-        if (file_exists($this->options['cache'] . $this->options['versionFile'])) {
+        if (HelperClass::fileExists($this->options['cache'] . $this->options['versionFile'])) {
 			$fileContent = file_get_contents($this->options['cache'] . $this->options['versionFile']);
 			$current = json_decode($fileContent, true);
 
