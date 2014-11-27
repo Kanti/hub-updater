@@ -15,7 +15,7 @@ class CacheOneFile
 
     public function is()
     {
-        if (! file_exists($this->fileName)) {
+        if (! HelperClass::fileExists($this->fileName)) {
             return false;
         }
         if (filemtime($this->fileName) < ( time() - $this->holdTime )) {
