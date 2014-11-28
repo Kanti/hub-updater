@@ -2,11 +2,6 @@
 
 namespace Kanti;
 
-/*
-rewrite:
-only do if nececery
-*/
-
 class HubUpdater
 {
     protected $options = array(
@@ -21,7 +16,7 @@ class HubUpdater
         "save" => "",
         "prerelease" => false,
 		
-		"internetException" => false,
+		"exceptions" => false,
     );
 
     protected $allRelease = array();
@@ -29,15 +24,16 @@ class HubUpdater
 
     public function __construct($option)
     {
+		//option Verarbeitung
         if (is_array($option)) {
             if (! isset($option['name'])) {
-                throw new Exception('No Name in Option Set');
+                throw new \Exception('No Name in Option Set');
             }
             $this->options = $option + $this->options;
         } elseif (is_string($option)) {
             $this->options['name'] = $option;
         } else {
-            throw new Exception('No Option Set');
+            throw new \Exception('No Option Set');
         }
 
         $this->options['save'] = rtrim($this->options['save'], '/');
@@ -54,6 +50,13 @@ class HubUpdater
                 mkdir($this->options['cache']);
             }
         }
+		$caBundleDir = dirname(__FILE__);
+		if (HelperClass::isInPhar()) {
+			$caBundleDir = dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $this->options['cache'];
+            if (! HelperClass::fileExists($this->options['cache'] . "ca_bundle.crt")) {
+				copy(dirname(__FILE__) . "/ca_bundle.crt",$caBundleDir . "ca_bundle.crt");
+            }
+		}
 
         $this->cachedInfo = new CacheOneFile($this->options['cache'] . $this->options['cacheFile']);
 
@@ -64,7 +67,7 @@ class HubUpdater
                                  Accept: application/vnd.github.v3+json",
                 ),
                 'ssl' => array(
-                    'cafile' => dirname($_SERVER["SCRIPT_FILENAME"]) . '/ca_bundle.crt',
+                    'cafile' => $caBundleDir . '/ca_bundle.crt',
                     'verify_peer' => true,
                 ),
             )
@@ -75,7 +78,7 @@ class HubUpdater
                     'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\n",
                 ),
                 'ssl' => array(
-                    'cafile' => dirname($_SERVER["SCRIPT_FILENAME"]) . '/ca_bundle.crt',
+                    'cafile' => $caBundleDir . '/ca_bundle.crt',
                     'verify_peer' => true,
                 ),
             )
@@ -90,20 +93,28 @@ class HubUpdater
             $fileContent = $this->cachedInfo->get();
         } else {
             if (!in_array('https', stream_get_wrappers())) {
-                return array();
+				if($this->options["exceptions"]){
+					throw new \Exception("No HTTPS Wrapper Exception");
+				} else {
+					return array();
+				}
             }
             $fileContent = @file_get_contents($path, false, $this->streamContext);
 
             if ($fileContent === false) {
-				if($this->options["internetException"]){
-					throw new Exception("No Internet Exception");
+				if($this->options["exceptions"]){
+					throw new \Exception("No Internet Exception");
 				} else {
 					return array();
 				}
             }
             $json = json_decode($fileContent, true);
             if (isset($json['message'])) {
-                $json = array();
+				if($this->options["exceptions"]){
+					throw new \Exception("API Exception");
+				} else {
+					$json = array();
+				}
             }
             $fileContent = json_encode($json, JSON_PRETTY_PRINT);
             $this->cachedInfo->set($fileContent);
@@ -163,7 +174,11 @@ class HubUpdater
     {
         $file = @fopen($url, 'r', false, $this->streamContext2);
         if ($file == false) {
-            return false;
+			if($this->options["exceptions"]){
+				throw new \Exception("Download faild Exception");
+			} else {
+				return false;
+			}
         }
         file_put_contents(
             dirname($_SERVER['SCRIPT_FILENAME']) . "/" . $this->options['cache'] . $this->options['zipFile'],
