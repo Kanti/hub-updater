@@ -58,7 +58,7 @@ class HubUpdater
             }
 		}
 
-        $this->cachedInfo = new CacheOneFile($this->options['cache'] . $this->options['cacheFile']);
+        $this->cachedInfo = new CacheOneFile(dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $this->options['cache'] . $this->options['cacheFile']);
 
         $this->streamContext = stream_context_create(
             array(
