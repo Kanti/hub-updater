@@ -153,13 +153,14 @@ class HubUpdater
 
     public function update()
     {
+		$newestRelease = $this->getNewestInfo();
         if ($this->able()) {
-            if ($this->download($this->newestRelease['zipball_url'])) {
+            if ($this->download($newestRelease['zipball_url'])) {
                 if ($this->unZip()) {
                     unlink($this->options['cache'] . $this->options['zipFile']);
                     file_put_contents($this->options['cache'] . $this->options['versionFile'], json_encode(array(
-                        "id" => $this->newestRelease['id'],
-                        "tag_name" => $this->newestRelease['tag_name']
+                        "id" => $newestRelease['id'],
+                        "tag_name" => $newestRelease['tag_name']
                                     ), JSON_PRETTY_PRINT));
 
                     return true;
