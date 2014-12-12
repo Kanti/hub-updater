@@ -6,6 +6,8 @@ class HubUpdater
 {
     protected $options = array(
         "cacheFile" => "downloadInfo.json",
+        "holdTime" => 43200,
+
         "versionFile" => "installedVersion.json",
         "zipFile" => "tmpZipFile.zip",
         "updateignore" => ".updateignore",
@@ -15,50 +17,58 @@ class HubUpdater
         "cache" => "cache/",
         "save" => "",
         "prerelease" => false,
+		
+		"exceptions" => false,
     );
 
     protected $allRelease = array();
-    protected $newestRelease = array();
     protected $streamContext = null;
 
     public function __construct($option)
     {
+		//options
         if (is_array($option)) {
             if (! isset($option['name'])) {
-                throw new Exception('No Name in Option Set');
+                throw new \Exception('No Name in Option Set');
             }
             $this->options = $option + $this->options;
         } elseif (is_string($option)) {
             $this->options['name'] = $option;
         } else {
-            throw new Exception('No Option Set');
+            throw new \Exception('No Option Set');
         }
 
         $this->options['save'] = rtrim($this->options['save'], '/');
         if ($this->options['save'] !== '') {
             $this->options['save'] .= '/';
-            if (!file_exists($this->options['save'])) {
+            if (!HelperClass::fileExists($this->options['save'])) {
                 mkdir($this->options['save']);
             }
         }
         $this->options['cache'] = $this->options['save'] . rtrim($this->options['cache'], '/');
         if ($this->options['cache'] !== '') {
             $this->options['cache'] .= '/';
-            if (!file_exists($this->options['cache'])) {
+            if (!HelperClass::fileExists($this->options['cache'])) {
                 mkdir($this->options['cache']);
             }
         }
+		$caBundleDir = dirname(__FILE__);
+		if (HelperClass::isInPhar()) {
+			$caBundleDir = dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $this->options['cache'];
+            if (! HelperClass::fileExists($this->options['cache'] . "ca_bundle.crt")) {
+				copy(dirname(__FILE__) . "/ca_bundle.crt",$caBundleDir . "ca_bundle.crt");
+            }
+		}
 
-        $this->cachedInfo = new CacheOneFile($this->options['cache'] . $this->options['cacheFile']);
+        $this->cachedInfo = new CacheOneFile(dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $this->options['cache'] . $this->options['cacheFile'],$this->options['holdTime']);
 
         $this->streamContext = stream_context_create(
             array(
                 'http' => array(
-                    'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\n
-                                 Accept: application/vnd.github.v3+json",
+                    'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\nAccept: application/vnd.github.v3+json\r\n",
                 ),
                 'ssl' => array(
-                    'cafile' => dirname(__FILE__) . '/ca_bundle.crt',
+                    'cafile' => $caBundleDir . '/ca_bundle.crt',
                     'verify_peer' => true,
                 ),
             )
@@ -69,7 +79,7 @@ class HubUpdater
                     'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\n",
                 ),
                 'ssl' => array(
-                    'cafile' => dirname(__FILE__) . '/ca_bundle.crt',
+                    'cafile' => $caBundleDir . '/ca_bundle.crt',
                     'verify_peer' => true,
                 ),
             )
@@ -84,16 +94,28 @@ class HubUpdater
             $fileContent = $this->cachedInfo->get();
         } else {
             if (!in_array('https', stream_get_wrappers())) {
-                return array();
+				if($this->options["exceptions"]){
+					throw new \Exception("No HTTPS Wrapper Exception");
+				} else {
+					return array();
+				}
             }
             $fileContent = @file_get_contents($path, false, $this->streamContext);
 
             if ($fileContent === false) {
-                return array();
+				if($this->options["exceptions"]){
+					throw new \Exception("No Internet Exception");
+				} else {
+					return array();
+				}
             }
             $json = json_decode($fileContent, true);
             if (isset($json['message'])) {
-                $json = array();
+				if($this->options["exceptions"]){
+					throw new \Exception("API Exception[" . $json['message'] . "]");
+				} else {
+					$json = array();
+				}
             }
             $fileContent = json_encode($json, JSON_PRETTY_PRINT);
             $this->cachedInfo->set($fileContent);
@@ -112,26 +134,17 @@ class HubUpdater
         if (empty($this->allRelease)) {
             return false;
         }
+		
+		$this->getNewestInfo();
 
-        foreach ($this->allRelease as $release) {
-            if (!$this->options['prerelease'] && $release['prerelease']) {
-                continue;
-            }
-            if ($this->options['branch'] !== $release['target_commitish']) {
-                continue;
-            }
-            $this->newestRelease = $release;
-            break;
-        }
-
-        if (file_exists($this->options['cache'] . $this->options['versionFile'])) {
+        if (HelperClass::fileExists($this->options['cache'] . $this->options['versionFile'])) {
             $fileContent = file_get_contents($this->options['cache'] . $this->options['versionFile']);
             $current = json_decode($fileContent, true);
 
-            if (isset($current['id']) && $current['id'] == $this->newestRelease['id']) {
+            if (isset($current['id']) && $current['id'] == $this->newestInfo['id']) {
                 return false;
             }
-            if (isset($current['tag_name']) && $current['tag_name'] == $this->newestRelease['tag_name']) {
+            if (isset($current['tag_name']) && $current['tag_name'] == $this->newestInfo['tag_name']) {
                 return false;
             }
         }
@@ -141,13 +154,14 @@ class HubUpdater
 
     public function update()
     {
+		$newestRelease = $this->getNewestInfo();
         if ($this->able()) {
-            if ($this->download($this->newestRelease['zipball_url'])) {
+            if ($this->download($newestRelease['zipball_url'])) {
                 if ($this->unZip()) {
                     unlink($this->options['cache'] . $this->options['zipFile']);
                     file_put_contents($this->options['cache'] . $this->options['versionFile'], json_encode(array(
-                        "id" => $this->newestRelease['id'],
-                        "tag_name" => $this->newestRelease['tag_name']
+                        "id" => $newestRelease['id'],
+                        "tag_name" => $newestRelease['tag_name']
                                     ), JSON_PRETTY_PRINT));
 
                     return true;
@@ -162,7 +176,11 @@ class HubUpdater
     {
         $file = @fopen($url, 'r', false, $this->streamContext2);
         if ($file == false) {
-            return false;
+			if($this->options["exceptions"]){
+				throw new \Exception("Download faild Exception");
+			} else {
+				return false;
+			}
         }
         file_put_contents(
             dirname($_SERVER['SCRIPT_FILENAME']) . "/" . $this->options['cache'] . $this->options['zipFile'],
@@ -177,7 +195,7 @@ class HubUpdater
     {
         $path = dirname($_SERVER['SCRIPT_FILENAME']) . "/" . $this->options['cache'] . $this->options['zipFile'];
         $updateIgnore = array();
-        if (file_exists($this->options['updateignore'])) {
+        if (HelperClass::fileExists($this->options['updateignore'])) {
             $updateIgnore = file($this->options['updateignore']);
             foreach($updateIgnore as &$ignore) {
                 $ignore = $this->options['save'] . trim($ignore);
@@ -202,7 +220,7 @@ class HubUpdater
                 if ($do) {
                     $stat = $zip->statIndex($i);
                     if ($stat["crc"] == 0) {
-                        if (!file_exists($name)) {
+                        if (!HelperClass::fileExists($name)) {
                             mkdir($name);
                         }
                     } else {
@@ -217,18 +235,48 @@ class HubUpdater
             return false;
         }
     }
+	
+	public function getCurrentInfo()
+	{
+		if(isset($this->currentInfo)) {
+			return $this->currentInfo;
+		}
+		
+		$this->currentInfo = null;
+        if (HelperClass::fileExists($this->options['cache'] . $this->options['versionFile'])) {
+			$fileContent = file_get_contents($this->options['cache'] . $this->options['versionFile']);
+			$current = json_decode($fileContent, true);
 
-    public function printOne()
-    {
-        $string = "<h3>Updated to<h3>";
-        $string .= "<h2>[" . $this->newestRelease['tag_name'] . "] " . $this->newestRelease['name'] . "</h2>\n";
-        $string .= "<p>" . $this->newestRelease['body'] . "</p>\n";
-
-        return $string;
-    }
-
-    public function getName()
-    {
-        return $this->newestRelease['tag_name'];
-    }
+			foreach ($this->allRelease as $release) {
+				if (isset($current['id']) && $current['id'] == $release['id']) {
+					$this->currentInfo = $release;
+					break;
+				}
+				if (isset($current['tag_name']) && $current['tag_name'] == $release['tag_name']) {
+					$this->currentInfo = $release;
+					break;
+				}
+			}
+		}
+		return $this->currentInfo;
+	}
+	
+	public function getNewestInfo()
+	{
+		if(isset($this->newestInfo)) {
+			return $this->newestInfo;
+		}
+		
+        foreach ($this->allRelease as $release) {
+            if (!$this->options['prerelease'] && $release['prerelease']) {
+                continue;
+            }
+            if ($this->options['branch'] !== $release['target_commitish']) {
+                continue;
+            }
+            $this->newestInfo = $release;
+            break;
+        }
+		return $this->newestInfo;
+	}
 }
