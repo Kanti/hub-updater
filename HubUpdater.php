@@ -2,10 +2,12 @@
 
 namespace Kanti;
 
-class HubUpdater
+class HubUpdater implements HubUpdaterInterface
 {
     protected $options = array(
         "cacheFile" => "downloadInfo.json",
+        "holdTime" => 43200,
+
         "versionFile" => "installedVersion.json",
         "zipFile" => "tmpZipFile.zip",
         "updateignore" => ".updateignore",
@@ -24,7 +26,7 @@ class HubUpdater
 
     public function __construct($option)
     {
-		//option Verarbeitung
+		//options
         if (is_array($option)) {
             if (! isset($option['name'])) {
                 throw new \Exception('No Name in Option Set');
@@ -58,13 +60,12 @@ class HubUpdater
             }
 		}
 
-        $this->cachedInfo = new CacheOneFile(dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $this->options['cache'] . $this->options['cacheFile']);
+        $this->cachedInfo = new CacheOneFile(dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $this->options['cache'] . $this->options['cacheFile'],$this->options['holdTime']);
 
         $this->streamContext = stream_context_create(
             array(
                 'http' => array(
-                    'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\n
-                                 Accept: application/vnd.github.v3+json",
+                    'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\nAccept: application/vnd.github.v3+json\r\n",
                 ),
                 'ssl' => array(
                     'cafile' => $caBundleDir . '/ca_bundle.crt',
@@ -111,7 +112,7 @@ class HubUpdater
             $json = json_decode($fileContent, true);
             if (isset($json['message'])) {
 				if($this->options["exceptions"]){
-					throw new \Exception("API Exception");
+					throw new \Exception("API Exception[" . $json['message'] . "]");
 				} else {
 					$json = array();
 				}
