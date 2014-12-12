@@ -2,7 +2,7 @@
 
 namespace Kanti;
 
-class HubUpdater implements HubUpdaterInterface
+class HubUpdater
 {
     protected $options = array(
         "cacheFile" => "downloadInfo.json",
