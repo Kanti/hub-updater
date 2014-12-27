@@ -39,10 +39,10 @@ The recommended way to install hub-updater is through
 curl -sS https://getcomposer.org/installer | php
 ```
 
-Next, run the Composer command to install the latest stable version of Guzzle:
+Next, run the Composer command to install the latest stable version of HubUpdater:
 
 ```bash
-composer require kanti/hub-updater dev-master
+composer require kanti/hub-updater ~0.3
 ```
 
 After installing, you need to require Composer's autoloader:
