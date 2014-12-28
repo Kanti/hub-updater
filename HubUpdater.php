@@ -65,7 +65,8 @@ class HubUpdater
         $this->streamContext = stream_context_create(
             array(
                 'http' => array(
-                    'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\nAccept: application/vnd.github.v3+json\r\n",
+                    'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\n"
+                        . "Accept: application/vnd.github.v3+json\r\n",
                 ),
                 'ssl' => array(
                     'cafile' => $caBundleDir . '/ca_bundle.crt',
@@ -287,6 +288,13 @@ class HubUpdater
             }
             $this->newestInfo = $release;
             break;
+        }
+        if (!isset($this->newestInfo)) {
+            if ($this->options["exceptions"]) {
+                throw new \Exception("no suitable release found");
+            } else {
+                return array();
+            }
         }
         return $this->newestInfo;
     }
