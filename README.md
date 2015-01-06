@@ -1,4 +1,5 @@
 #HubUpdater
+![https://github.com/Kanti/hub-updater/releases/latest](https://img.shields.io/github/release/kanti/hub-updater.svg?style=flat-square) ![https://packagist.org/packages/kanti/hub-updater](https://img.shields.io/packagist/dt/kanti/hub-updater.svg?style=flat-square)
 
 Simple Github Updater for Web Projects [PHP]
 
