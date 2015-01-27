@@ -4,3 +4,4 @@ example.php export-ignore
 example2.php export-ignore
 .updateignore export-ignore
 README.md export-ignore
+tests export-ignore
