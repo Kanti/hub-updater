@@ -28,11 +28,14 @@ class HubUpdater
     {
         //options
         if (is_array($option)) {
-            if (!isset($option['name'])) {
+            if (!isset($option['name']) || empty($option['name'])) {
                 throw new \Exception('No Name in Option Set');
             }
             $this->options = $option + $this->options;
         } elseif (is_string($option)) {
+            if(empty($option)){
+                throw new \Exception('No Name Set');
+            }
             $this->options['name'] = $option;
         } else {
             throw new \Exception('No Option Set');

@@ -18,6 +18,8 @@ class CacheOneFile
         if (! HelperClass::fileExists($this->fileName)) {
             return false;
         }
+        clearstatcache();
+
         if (filemtime($this->fileName) < ( time() - $this->holdTime )) {
             unlink($this->fileName);
 
