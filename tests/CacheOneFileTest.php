@@ -44,7 +44,7 @@ class CacheOneFileTest extends \PHPUnit_Framework_TestCase
         if (!$cache->is()) {
             $this->fail("could not set");
         }
-        touch($fileName, 0);
+        touch($fileName, 1);//1 because of hhvm bug
         if ($cache->is()) {
             $this->fail("does not reset");
         }
