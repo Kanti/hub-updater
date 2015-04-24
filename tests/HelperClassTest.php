@@ -12,13 +12,13 @@ use Kanti\HelperClass;
 
 class HelperClassTest extends \PHPUnit_Framework_TestCase {
 
-    private $invalidFileNames = [
+    private $invalidFileNames = array(
         true,
         false,
         array('array'),
-    ];
+    );
 
-    private $validFileNames = [
+    private $validFileNames = array(
         '',
         'a',
         'ab',
@@ -26,7 +26,7 @@ class HelperClassTest extends \PHPUnit_Framework_TestCase {
         1,
         12,
         123,
-    ];
+    );
 
     public function testStaticFileExists()
     {
