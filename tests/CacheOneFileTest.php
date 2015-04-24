@@ -56,6 +56,9 @@ class CacheOneFileTest extends \PHPUnit_Framework_TestCase
         $time = 60 * 60;//1h
         $cache = new CacheOneFile($fileName, $time);
 
+        if(is_dir(dirname($fileName))){
+            rmdir(dirname($fileName));
+        }
         foreach ($this->validContent as $value) {
             $cache->set($value);
             if ($cache->get() !== (string)$value) {
