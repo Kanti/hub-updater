@@ -12,12 +12,10 @@ php:
  
 # Commands to be run before your environment runs.
 before_script:
-  - composer self-update
-  - composer config --list
-  - composer install --prefer-source --no-interaction
+  - composer dump-autoload
 
 # Commands you want to run that will verify your build.
-script: phpunit
+script: vendor\bin\phpunit -c tests\phpunit.xml
 
 # allow_failures: Allow this build to fail under the specified environments.
 # fast_finish: If your build fails do not continue trying to build, just stop.
