@@ -10,7 +10,8 @@ namespace Kanti\Test;
 
 use Kanti\HelperClass;
 
-class HelperClassTest extends \PHPUnit_Framework_TestCase {
+class HelperClassTest extends \PHPUnit_Framework_TestCase
+{
 
     private $invalidFileNames = array(
         true,
@@ -45,8 +46,9 @@ class HelperClassTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
-    public function testIsInPhar(){
-        if(HelperClass::isInPhar()){
+    public function testIsInPhar()
+    {
+        if (HelperClass::isInPhar()) {
             $this->fail("unit test is in phar?");
         }
     }
