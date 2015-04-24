@@ -12,13 +12,13 @@ use Kanti\CacheOneFile;
 
 class CacheOneFileTest extends \PHPUnit_Framework_TestCase
 {
-    private $invalidContent = [
+    private $invalidContent = array(
         true,
         false,
         array('content'),
-    ];
+    );
 
-    private $validContent = [
+    private $validContent = array(
         '',
         'a',
         'ab',
@@ -26,7 +26,7 @@ class CacheOneFileTest extends \PHPUnit_Framework_TestCase
         1,
         12,
         123,
-    ];
+    );
 
     public function testIs()
     {
