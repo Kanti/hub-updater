@@ -33,7 +33,7 @@ class HubUpdater
             }
             $this->options = $option + $this->options;
         } elseif (is_string($option)) {
-            if(empty($option)){
+            if (empty($option)) {
                 throw new \Exception('No Name Set');
             }
             $this->options['name'] = $option;
