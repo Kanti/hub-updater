@@ -22,7 +22,8 @@
     "require-dev": {
         "phpunit/phpunit": "4.*",
         "squizlabs/php_codesniffer": "*",
-        "sebastian/phpcpd": "*"
+        "sebastian/phpcpd": "*",
+        "codeclimate/php-test-reporter": "dev-master"
     },
     "autoload": {
         "psr-4": {
