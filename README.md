@@ -1,7 +1,9 @@
+[![Packagist](https://img.shields.io/packagist/v/kanti/hub-updater.svg?style=flat-square)](https://packagist.org/packages/kanti/hub-updater)
+[![Packagist](https://img.shields.io/packagist/l/kanti/hub-updater.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-2.0.html)
+[![Travis](https://img.shields.io/travis/Kanti/hub-updater.svg?style=flat-square)](https://travis-ci.org/Kanti/hub-updater/)
+[![Code Climate](https://img.shields.io/codeclimate/github/Kanti/hub-updater.svg?style=flat-square)](https://codeclimate.com/github/Kanti/hub-updater)
+[![Code Climate](https://img.shields.io/codeclimate/coverage/github/Kanti/hub-updater.svg?style=flat-square)](https://codeclimate.com/github/Kanti/hub-updater/coverage)
 #HubUpdater
-<a href="https://github.com/Kanti/hub-updater/releases/latest" target="_blank">![releases](https://img.shields.io/github/release/kanti/hub-updater.svg?style=flat-square)</a>
-<a href="https://packagist.org/packages/kanti/hub-updater" target="_blank">![packagist](https://img.shields.io/packagist/dt/kanti/hub-updater.svg?style=flat-square)</a>
-<a href="https://travis-ci.org/Kanti/hub-updater" target="_blank">![travis](http://img.shields.io/travis/Kanti/hub-updater.svg?style=flat-square)</a>
 
 Simple Github Updater for Web Projects [PHP]
 
