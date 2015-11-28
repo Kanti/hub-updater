@@ -1,29 +1,34 @@
 # Required to run your project under the correct environment.
 language: php
 
-# Versions of PHP you want your project run with.
-php:
-  - 5.3
-  - 5.4
-  - 5.5
-  - 5.6
-  - 7
-  - hhvm
- 
-# Commands to be run before your environment runs.
-before_script:
-  - composer dump-autoload
-
-# Commands you want to run that will verify your build.
-script: phpunit -c tests/phpunit.xml
 
 # allow_failures: Allow this build to fail under the specified environments.
 # fast_finish: If your build fails do not continue trying to build, just stop.
 matrix:
   allow_failures:
-    - php: hhvm
+    - php: nightly
   fast_finish: true
-  
+  include:
+    - php: 5.3
+    - php: 5.4
+    - php: 5.5
+    - php: 5.6
+    - php: 7.0
+    - php: hhvm
+    - php: nightly
+
+
+# Commands to be run before your environment runs.
+install:
+  - composer install --dev --no-interaction
+  - phpenv rehash
+
+# Commands you want to run that will verify your build.
+script:
+  - ./vendor/bin/phpunit -c tests/phpunit.xml
+  - ./vendor/bin/phpcs --standard=PSR2 ./src ./tests -n
+  - ./vendor/bin/phpcpd ./src ./tests -n
+
 # Customize when the notification emails are sent.
 notifications:
     on_success: never

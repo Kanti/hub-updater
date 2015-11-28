@@ -21,7 +21,7 @@ class HelperClass
         return file_exists(dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $file);
     }
 
-    static public function isInPhar()
+    public static function isInPhar()
     {
         return substr(__FILE__, 0, 7) === "phar://";
     }

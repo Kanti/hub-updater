@@ -53,4 +53,3 @@ class HelperClassTest extends \PHPUnit_Framework_TestCase
         }
     }
 }
- 

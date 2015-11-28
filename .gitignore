@@ -1,5 +1,6 @@
 vendor/
 cache/
 save/
-.idea
+.idea/
 build/
+composer.lock
