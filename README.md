@@ -9,7 +9,7 @@ Simple Github Updater for Web Projects [PHP]
 
 ## is HubUpdater for me? [Checklist]
 
-- [ ] I have an little product/projekt on github. (~ <=30MB)
+- [ ] I have a little product/projekt on github. (~ <=30MB)
 - [ ] it can run PHP and uses [composer](https://getcomposer.org/)s autoloader
 - [ ] I want my users to update my Product with one click
 
@@ -47,7 +47,7 @@ curl -sS https://getcomposer.org/installer | php
 Next, run the Composer command to install the latest stable version of HubUpdater:
 
 ```bash
-composer require kanti/hub-updater ~0.3
+composer require kanti/hub-updater 0.4.*
 ```
 
 After installing, you need to require Composer's autoloader:
