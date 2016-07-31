@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Matthias
- * Date: 27.01.2015
- * Time: 08:55
- */
-
 namespace Kanti\Test;
 
 use Kanti\CacheOneFile;
@@ -28,6 +21,9 @@ class CacheOneFileTest extends \PHPUnit_Framework_TestCase
         123,
     );
 
+    /**
+     * @group fast
+     */
     public function testIs()
     {
         $fileName = __DIR__ . "/asserts/testFile.txt";
@@ -50,6 +46,9 @@ class CacheOneFileTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @group fast
+     */
     public function testGet()
     {
         $fileName = __DIR__ . "/asserts/testFile.txt";

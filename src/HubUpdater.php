@@ -2,8 +2,13 @@
 
 namespace Kanti;
 
+use Composer\CaBundle\CaBundle;
+
 class HubUpdater
 {
+    /**
+     * @var array
+     */
     protected $options = array(
         "cacheFile" => "downloadInfo.json",
         "holdTime" => 43200,
@@ -17,13 +22,28 @@ class HubUpdater
         "cache" => "cache/",
         "save" => "",
         "prerelease" => false,
+        "auth" => null,
 
         "exceptions" => false,
     );
-
+    /**
+     * @var array
+     */
     protected $allRelease = array();
+    /**
+     * @var array
+     */
+    protected $newestInfo = null;
+    /**
+     * @var null|resource
+     */
     protected $streamContext = null;
 
+    /**
+     * HubUpdater constructor.
+     * @param array|string $option
+     * @throws \Exception
+     */
     public function __construct($option)
     {
         //options
@@ -55,27 +75,26 @@ class HubUpdater
                 mkdir(dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $this->options['cache']);
             }
         }
-        $caBundleDir = dirname(__FILE__);
-        if (HelperClass::isInPhar()) {
-            $caBundleDir = dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $this->options['cache'];
-            if (!HelperClass::fileExists($this->options['cache'] . "ca_bundle.crt")) {
-                copy(dirname(__FILE__) . "/ca_bundle.crt", $caBundleDir . "ca_bundle.crt");
-            }
-        }
 
         $this->cachedInfo = new CacheOneFile(
             dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $this->options['cache'] . $this->options['cacheFile'],
             $this->options['holdTime']
         );
 
+        $additionalHeader = '';
+        if ($this->options['auth']) {
+            $additionalHeader .= "Authorization: Basic " . base64_encode($this->options['auth']) . "\r\n";
+        }
+
         $this->streamContext = stream_context_create(
             array(
                 'http' => array(
                     'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\n"
-                        . "Accept: application/vnd.github.v3+json\r\n",
+                        . "Accept: application/vnd.github.v3+json\r\n"
+                        . $additionalHeader,
                 ),
                 'ssl' => array(
-                    'cafile' => $caBundleDir . '/ca_bundle.crt',
+                    'cafile' => CaBundle::getSystemCaRootBundlePath(),
                     'verify_peer' => true,
                 ),
             )
@@ -83,10 +102,11 @@ class HubUpdater
         $this->streamContext2 = stream_context_create(
             array(
                 'http' => array(
-                    'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\n",
+                    'header' => "User-Agent: Awesome-Update-My-Self-" . $this->options['name'] . "\r\n"
+                        . $additionalHeader,
                 ),
                 'ssl' => array(
-                    'cafile' => $caBundleDir . '/ca_bundle.crt',
+                    'cafile' => CaBundle::getSystemCaRootBundlePath(),
                     'verify_peer' => true,
                 ),
             )
@@ -108,15 +128,17 @@ class HubUpdater
                 }
             }
             $fileContent = @file_get_contents($path, false, $this->streamContext);
+            $headers = $http_response_header;
 
             if ($fileContent === false) {
                 if ($this->options["exceptions"]) {
                     throw new \Exception("No Internet Exception");
                 } else {
-                    return array();
+                    return array("headers" => $headers);
                 }
             }
             $json = json_decode($fileContent, true);
+            $json["headers"] = $headers;
             if (isset($json['message'])) {
                 if ($this->options["exceptions"]) {
                     throw new \Exception("API Exception[" . $json['message'] . "]");
@@ -146,16 +168,16 @@ class HubUpdater
             return false;
         }
 
-        $this->getNewestInfo();
+        $newestInfo = $this->getNewestInfo();
 
         if (HelperClass::fileExists($this->options['cache'] . $this->options['versionFile'])) {
             $fileContent = file_get_contents(dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $this->options['cache'] . $this->options['versionFile']);
             $current = json_decode($fileContent, true);
 
-            if (isset($current['id']) && $current['id'] == $this->newestInfo['id']) {
+            if (isset($current['id']) && $current['id'] == $newestInfo['id']) {
                 return false;
             }
-            if (isset($current['tag_name']) && $current['tag_name'] == $this->newestInfo['tag_name']) {
+            if (isset($current['tag_name']) && $current['tag_name'] == $newestInfo['tag_name']) {
                 return false;
             }
         }
@@ -201,7 +223,7 @@ class HubUpdater
         $file = @fopen($url, 'r', false, $this->streamContext2);
         if ($file == false) {
             if ($this->options["exceptions"]) {
-                throw new \Exception("Download faild Exception");
+                throw new \Exception("Download failed Exception");
             } else {
                 return false;
             }
@@ -229,7 +251,8 @@ class HubUpdater
         $zip = new \ZipArchive();
         if ($zip->open($path) === true) {
             $cutLength = strlen($zip->getNameIndex(0));
-            for ($i = 1; $i < $zip->numFiles; $i++) {//iterate throw the Zip
+            for ($i = 1; $i < $zip->numFiles; $i++) {
+                //iterate throw the Zip
                 $name = $this->options['save'] . substr($zip->getNameIndex($i), $cutLength);
 
                 $do = true;
@@ -290,7 +313,7 @@ class HubUpdater
 
     public function getNewestInfo()
     {
-        if (isset($this->newestInfo)) {
+        if (!is_null($this->newestInfo)) {
             return $this->newestInfo;
         }
 
@@ -312,5 +335,34 @@ class HubUpdater
             }
         }
         return $this->newestInfo;
+    }
+
+    public function useAuth($auth)
+    {
+        $this->options['auth'] = $auth;
+    }
+
+    /**
+     * @return array|string
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * @return array|mixed
+     */
+    public function getAllRelease()
+    {
+        return $this->allRelease;
+    }
+
+    /**
+     * @return null|resource
+     */
+    public function getStreamContext()
+    {
+        return $this->streamContext;
     }
 }

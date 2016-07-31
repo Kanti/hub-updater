@@ -12,7 +12,6 @@ use Kanti\HelperClass;
 
 class HelperClassTest extends \PHPUnit_Framework_TestCase
 {
-
     private $invalidFileNames = array(
         true,
         false,
@@ -29,6 +28,9 @@ class HelperClassTest extends \PHPUnit_Framework_TestCase
         123,
     );
 
+    /**
+     * @group fast
+     */
     public function testStaticFileExists()
     {
         foreach ($this->invalidFileNames as $value) {
@@ -46,6 +48,9 @@ class HelperClassTest extends \PHPUnit_Framework_TestCase
         }
     }
 
+    /**
+     * @group fast
+     */
     public function testIsInPhar()
     {
         if (HelperClass::isInPhar()) {

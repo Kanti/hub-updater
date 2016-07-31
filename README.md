@@ -77,6 +77,7 @@ new \Kanti\HubUpdater($settings);
 |versionFile|name of the InstalledVersionInformation is safed(in cacheDir)|``installedVersion.json``|
 |zipFile|name of the temporary zip file(in cacheDir)|``tmpZipFile.zip``|
 |updateignore|name of the updateignore file(in root of project)|``.updateignore``|
+|auth|github api auth user:apiKey/password|``null``|
 |exceptions|if true, will ``throw new \Exception`` on failure|``false``|
 
 ## Check for an update [complete]
