@@ -1,6 +1,6 @@
 [![Packagist](https://img.shields.io/packagist/v/kanti/hub-updater.svg?style=flat-square)](https://packagist.org/packages/kanti/hub-updater)
 [![Packagist](https://img.shields.io/packagist/l/kanti/hub-updater.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-2.0.html)
-[![Travis](https://img.shields.io/travis/Kanti/hub-updater.svg?style=flat-square)](https://travis-ci.org/Kanti/hub-updater/)
+[![Travis](http://php-eye.com/badge/kanti/hub-updater/tested.svg)](https://travis-ci.org/Kanti/hub-updater/)
 [![Code Climate](https://img.shields.io/codeclimate/github/Kanti/hub-updater.svg?style=flat-square)](https://codeclimate.com/github/Kanti/hub-updater)
 [![Code Climate](https://img.shields.io/codeclimate/coverage/github/Kanti/hub-updater.svg?style=flat-square)](https://codeclimate.com/github/Kanti/hub-updater/coverage)
 #HubUpdater
