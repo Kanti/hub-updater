@@ -32,16 +32,16 @@ class CacheOneFileTest extends \PHPUnit_Framework_TestCase
             unlink($fileName);
         }
         $cache = new CacheOneFile($fileName, $time);
-        if ($cache->is()) {
+        if ($cache->has()) {
             $this->fail("is not set");
         }
 
         touch($fileName);
-        if (!$cache->is()) {
+        if (!$cache->has()) {
             $this->fail("could not set");
         }
         touch($fileName, 1);//1 because of hhvm bug
-        if ($cache->is()) {
+        if ($cache->has()) {
             $this->fail("does not reset");
         }
     }

@@ -11,7 +11,6 @@ class HubUpdaterTest extends \PHPUnit_Framework_TestCase
     public static function goBack()
     {
         chdir(static::$back);
-        $_SERVER["SCRIPT_FILENAME"] = static::$back . '/index.php';
     }
 
     public static function goToEmptyDir()
@@ -21,7 +20,6 @@ class HubUpdaterTest extends \PHPUnit_Framework_TestCase
         $filesystem->mkdir(__DIR__ . '/tests/empty');
         static::$back = getcwd();
         chdir(__DIR__ . '/tests/empty');
-        $_SERVER["SCRIPT_FILENAME"] = __DIR__ . '/tests/empty/index.php';
     }
 
     public function testStartupArray()
@@ -32,10 +30,7 @@ class HubUpdaterTest extends \PHPUnit_Framework_TestCase
             "auth" => "kanti:a2a1daee80b428558882ead92d6a8847eab00261"
         ));
         if (!$hubUpdater->able()) {
-            $this->fail(
-                "empty Dir was not updateable"
-                . json_encode($hubUpdater->getAllRelease())
-            );
+            $this->fail("empty Dir was not updateable");
         }
         static::goBack();
     }
@@ -46,13 +41,14 @@ class HubUpdaterTest extends \PHPUnit_Framework_TestCase
     public function testStartupString()
     {
         static::goToEmptyDir();
+        $hubUpdater = new HubUpdater(array(
+            "name" => "Kanti/test",
+            "auth" => "kanti:a2a1daee80b428558882ead92d6a8847eab00261"
+        ));
+        unset($hubUpdater);
         $hubUpdater = new HubUpdater("Kanti/test");
-        $hubUpdater->useAuth("kanti:a2a1daee80b428558882ead92d6a8847eab00261");
         if (!$hubUpdater->able()) {
-            $this->fail(
-                "empty Dir was not updateable"
-                . json_encode($hubUpdater->getAllRelease())
-            );
+            $this->fail("empty Dir was not updateable");
         }
         if (!is_null($hubUpdater->getCurrentInfo())) {
             $this->fail("current info should be null in empty Dir");
@@ -72,10 +68,7 @@ class HubUpdaterTest extends \PHPUnit_Framework_TestCase
             "auth" => "kanti:a2a1daee80b428558882ead92d6a8847eab00261",
         ));
         if (!$hubUpdater->able()) {
-            $this->fail(
-                "empty Dir was not updateable"
-                . json_encode($hubUpdater->getAllRelease())
-            );
+            $this->fail("empty Dir was not updateable");
         }
         if (!(file_exists("temp")) && is_dir("temp")) {
             $this->fail("save Dir was not created");
@@ -114,6 +107,26 @@ class HubUpdaterTest extends \PHPUnit_Framework_TestCase
     {
         static::goToEmptyDir();
         new HubUpdater(null);
+        static::goBack();
+    }
+
+    /**
+     * @expectedException \Exception
+     * @depends testException3
+     */
+    public function testException4()
+    {
+        static::goToEmptyDir();
+        $hubUpdater = new HubUpdater(array(
+            "name" => "kanti/qwertzuiopasdfghjklyxcvbnm",
+        ));
+        if ($hubUpdater->able()) {
+            static::fail("none existent repo was updateable");
+        }
+        new HubUpdater(array(
+            "name" => "kanti/qwertzuiopasdfghjklyxcvbnm",
+            "exceptions" => true,
+        ));
         static::goBack();
     }
 }
