@@ -6,6 +6,8 @@ use Composer\CaBundle\CaBundle;
 
 class HubUpdater
 {
+    protected static $JSON_PRETTY_PRINT = 0;
+
     /**
      * @var array
      */
@@ -46,6 +48,9 @@ class HubUpdater
      */
     public function __construct($option)
     {
+        if (defined("JSON_PRETTY_PRINT")) {
+            static::$JSON_PRETTY_PRINT = JSON_PRETTY_PRINT;
+        }
         //options
         if (is_array($option)) {
             if (!isset($option['name']) || empty($option['name'])) {
@@ -146,11 +151,7 @@ class HubUpdater
                     $json = array();
                 }
             }
-            if (defined("JSON_PRETTY_PRINT")) {
-                $fileContent = json_encode($json, JSON_PRETTY_PRINT);
-            } else {
-                $fileContent = json_encode($json);
-            }
+            $fileContent = json_encode($json, static::$JSON_PRETTY_PRINT);
             $this->cachedInfo->set($fileContent);
 
             return $json;
@@ -192,24 +193,13 @@ class HubUpdater
             if ($this->download($newestRelease['zipball_url'])) {
                 if ($this->unZip()) {
                     unlink(dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $this->options['cache'] . $this->options['zipFile']);
-                    if (defined("JSON_PRETTY_PRINT")) {
-                        file_put_contents(
-                            dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $this->options['cache'] . $this->options['versionFile'],
-                            json_encode(array(
-                                "id" => $newestRelease['id'],
-                                "tag_name" => $newestRelease['tag_name']
-                            ), JSON_PRETTY_PRINT)
-                        );
-                    } else {
-                        file_put_contents(
-                            dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $this->options['cache'] . $this->options['versionFile'],
-                            json_encode(array(
-                                "id" => $newestRelease['id'],
-                                "tag_name" => $newestRelease['tag_name']
-                            ))
-                        );
-                    }
-
+                    file_put_contents(
+                        dirname($_SERVER["SCRIPT_FILENAME"]) . "/" . $this->options['cache'] . $this->options['versionFile'],
+                        json_encode(array(
+                            "id" => $newestRelease['id'],
+                            "tag_name" => $newestRelease['tag_name']
+                        ), static::$JSON_PRETTY_PRINT)
+                    );
                     return true;
                 }
             }
@@ -343,7 +333,7 @@ class HubUpdater
     }
 
     /**
-     * @return array|string
+     * @return array
      */
     public function getOptions()
     {
@@ -351,7 +341,7 @@ class HubUpdater
     }
 
     /**
-     * @return array|mixed
+     * @return array
      */
     public function getAllRelease()
     {

@@ -6,29 +6,9 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class HupUpdaterUpdateTest extends \PHPUnit_Framework_TestCase
 {
-    protected $back;
-
-    public function goBack()
-    {
-        chdir($this->back);
-        $_SERVER["SCRIPT_FILENAME"] = $this->back . '/index.php';
-        $filesystem = new Filesystem;
-        $filesystem->remove(__DIR__ . '/tests/empty');
-    }
-
-    public function goToEmptyDir()
-    {
-        $filesystem = new Filesystem;
-        $filesystem->remove(__DIR__ . '/tests/empty');
-        $filesystem->mkdir(__DIR__ . '/tests/empty');
-        $this->back = getcwd();
-        chdir(__DIR__ . '/tests/empty');
-        $_SERVER["SCRIPT_FILENAME"] = __DIR__ . '/tests/empty/index.php';
-    }
-
     public function testUpdate1()
     {
-        $this->goToEmptyDir();
+        HubUpdaterTest::goToEmptyDir();
         $hubUpdater = new HubUpdater(array(
             "name" => "Kanti/test",
             "auth" => "kanti:a2a1daee80b428558882ead92d6a8847eab00261",
@@ -49,11 +29,20 @@ class HupUpdaterUpdateTest extends \PHPUnit_Framework_TestCase
             $this->fail("updated dir was updated again");
         }
         if (!is_array($hubUpdater->getCurrentInfo())) {
-            $this->fail("getCurrentInfo returned nonObject");
+            $this->fail("getCurrentInfo returned nonArray");
         }
         if (!is_array($hubUpdater->getNewestInfo())) {
-            $this->fail("getNewestInfo returned nonObject");
+            $this->fail("getNewestInfo returned nonArray");
         }
-        $this->goBack();
+        if (!is_array($hubUpdater->getOptions())) {
+            $this->fail("getOptions returned nonArray");
+        }
+        if (!is_resource($hubUpdater->getStreamContext())) {
+            $this->fail("getStreamContext returned nonResource");
+        }
+        if (!is_array($hubUpdater->getAllRelease())) {
+            $this->fail("getAllRelease returned nonArray");
+        }
+        HubUpdaterTest::goBack();
     }
 }

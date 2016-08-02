@@ -6,27 +6,27 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class HubUpdaterTest extends \PHPUnit_Framework_TestCase
 {
-    protected $back;
+    protected static $back;
 
-    public function goBack()
+    public static function goBack()
     {
-        chdir($this->back);
-        $_SERVER["SCRIPT_FILENAME"] = $this->back . '/index.php';
+        chdir(static::$back);
+        $_SERVER["SCRIPT_FILENAME"] = static::$back . '/index.php';
     }
 
-    public function goToEmptyDir()
+    public static function goToEmptyDir()
     {
         $filesystem = new Filesystem;
-        $filesystem->remove(__DIR__ . 'tests/empty');
-        $filesystem->mkdir(__DIR__ . 'tests/empty');
-        $this->back = getcwd();
-        chdir(__DIR__ . 'tests/empty');
-        $_SERVER["SCRIPT_FILENAME"] = __DIR__ . 'tests/empty/index.php';
+        $filesystem->remove(__DIR__ . '/tests/empty');
+        $filesystem->mkdir(__DIR__ . '/tests/empty');
+        static::$back = getcwd();
+        chdir(__DIR__ . '/tests/empty');
+        $_SERVER["SCRIPT_FILENAME"] = __DIR__ . '/tests/empty/index.php';
     }
 
     public function testStartupArray()
     {
-        $this->goToEmptyDir();
+        static::goToEmptyDir();
         $hubUpdater = new HubUpdater(array(
             "name" => "Kanti/test",
             "auth" => "kanti:a2a1daee80b428558882ead92d6a8847eab00261"
@@ -37,7 +37,7 @@ class HubUpdaterTest extends \PHPUnit_Framework_TestCase
                 . json_encode($hubUpdater->getAllRelease())
             );
         }
-        $this->goBack();
+        static::goBack();
     }
 
     /**
@@ -45,7 +45,7 @@ class HubUpdaterTest extends \PHPUnit_Framework_TestCase
      */
     public function testStartupString()
     {
-        $this->goToEmptyDir();
+        static::goToEmptyDir();
         $hubUpdater = new HubUpdater("Kanti/test");
         $hubUpdater->useAuth("kanti:a2a1daee80b428558882ead92d6a8847eab00261");
         if (!$hubUpdater->able()) {
@@ -57,7 +57,7 @@ class HubUpdaterTest extends \PHPUnit_Framework_TestCase
         if (!is_null($hubUpdater->getCurrentInfo())) {
             $this->fail("current info should be null in empty Dir");
         }
-        $this->goBack();
+        static::goBack();
     }
 
     /**
@@ -65,7 +65,7 @@ class HubUpdaterTest extends \PHPUnit_Framework_TestCase
      */
     public function testStartupArrayNotEmptySaveDir()
     {
-        $this->goToEmptyDir();
+        static::goToEmptyDir();
         $hubUpdater = new HubUpdater(array(
             "name" => "Kanti/test",
             "save" => "temp/",
@@ -81,7 +81,7 @@ class HubUpdaterTest extends \PHPUnit_Framework_TestCase
             $this->fail("save Dir was not created");
         }
 
-        $this->goBack();
+        static::goBack();
     }
 
     /**
@@ -90,9 +90,9 @@ class HubUpdaterTest extends \PHPUnit_Framework_TestCase
      */
     public function testException1()
     {
-        $this->goToEmptyDir();
+        static::goToEmptyDir();
         new HubUpdater(array());
-        $this->goBack();
+        static::goBack();
     }
 
     /**
@@ -101,9 +101,9 @@ class HubUpdaterTest extends \PHPUnit_Framework_TestCase
      */
     public function testException2()
     {
-        $this->goToEmptyDir();
+        static::goToEmptyDir();
         new HubUpdater("");
-        $this->goBack();
+        static::goBack();
     }
 
     /**
@@ -112,8 +112,8 @@ class HubUpdaterTest extends \PHPUnit_Framework_TestCase
      */
     public function testException3()
     {
-        $this->goToEmptyDir();
+        static::goToEmptyDir();
         new HubUpdater(null);
-        $this->goBack();
+        static::goBack();
     }
 }

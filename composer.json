@@ -20,7 +20,6 @@
         "issues": "https://github.com/Kanti/hub-updater/issues",
         "source": "https://github.com/Kanti/hub-updater"
     },
-    "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.6",
         "composer/ca-bundle": "^1.0"
@@ -30,7 +29,7 @@
         "squizlabs/php_codesniffer": "2.*",
         "friendsofphp/php-cs-fixer": "1.*",
         "sebastian/phpcpd": "2.*",
-        "codeclimate/php-test-reporter": "0.1.*",
+        "codeclimate/php-test-reporter": "0.*",
         "phpro/grumphp": "0.*"
     },
     "autoload": {
