@@ -43,6 +43,7 @@ class HupUpdaterUpdateTest extends \PHPUnit_Framework_TestCase
         if (!is_array($hubUpdater->getAllRelease())) {
             $this->fail("getAllRelease returned nonArray");
         }
+        HubUpdaterTest::goToEmptyDir();
         HubUpdaterTest::goBack();
     }
 }

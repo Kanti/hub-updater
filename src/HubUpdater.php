@@ -308,10 +308,10 @@ class HubUpdater
         }
 
         foreach ($this->allRelease as $release) {
-            if (!$this->options['prerelease'] && $release['prerelease']) {
+            if (isset($release['prerelease']) && !$this->options['prerelease'] && $release['prerelease']) {
                 continue;
             }
-            if ($this->options['branch'] !== $release['target_commitish']) {
+            if (isset($release['target_commitish']) && $this->options['branch'] !== $release['target_commitish']) {
                 continue;
             }
             $this->newestInfo = $release;
