@@ -47,7 +47,7 @@ curl -sS https://getcomposer.org/installer | php
 Next, run the Composer command to install the latest stable version of HubUpdater:
 
 ```bash
-composer require kanti/hub-updater 0.4.*
+composer require kanti/hub-updater 0.5.*
 ```
 
 After installing, you need to require Composer's autoloader:
