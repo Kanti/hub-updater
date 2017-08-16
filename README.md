@@ -3,7 +3,7 @@
 [![Travis](http://php-eye.com/badge/kanti/hub-updater/tested.svg)](https://travis-ci.org/Kanti/hub-updater/)
 [![Code Climate](https://img.shields.io/codeclimate/github/Kanti/hub-updater.svg?style=flat-square)](https://codeclimate.com/github/Kanti/hub-updater)
 [![Code Climate](https://img.shields.io/codeclimate/coverage/github/Kanti/hub-updater.svg?style=flat-square)](https://codeclimate.com/github/Kanti/hub-updater/coverage)
-#HubUpdater
+# HubUpdater
 
 Simple Github Updater for Web Projects [PHP]
 
